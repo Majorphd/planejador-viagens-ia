@@ -32,7 +32,7 @@ cd planejador-viagens-ia
 pip install -r requirements.txt
 
 3. Crie um arquivo .streamlit/secrets.toml ou use st.secrets:
-GEMINI_API_KEY = "sua-chave-da-api"
+GEMINI_API_KEY = "cole-sua-chave-da-api"
 
 4. Execute o projeto:
 streamlit run app.py
