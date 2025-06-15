@@ -37,8 +37,8 @@ GEMINI_API_KEY = "sua-chave-da-api"
 4. Execute o projeto:
 streamlit run app.py
 
-🌐 Link da Aplicação (Deploy no Streamlit Cloud)
-👉 Acesse aqui o aplicativo
+## 🔗 Acesse o app online:
+👉 [Clique aqui para acessar o app no Streamlit](https://planejador-viagens-ia-o4urktanhcunkgcg3npprz.streamlit.app)
 
 👥 Integrantes do Grupo
 Paulo Henrique Dantas Teodósio RGM:40068170
