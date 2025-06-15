@@ -25,7 +25,28 @@ Este projeto é um **Software as a Service (SaaS)** desenvolvido com **Streamlit
 ## 🚀 Como Executar Localmente
 
 1. Clone este repositório:
-
-```bash
-https://github.com/Majorphd/planejador-viagens-ia.git
+```https://github.com/Majorphd/planejador-viagens-ia.git```
 cd planejador-viagens-ia
+
+2. Instale as dependências:
+pip install -r requirements.txt
+
+3. Crie um arquivo .streamlit/secrets.toml ou use st.secrets:
+GEMINI_API_KEY = "sua-chave-da-api"
+
+4. Execute o projeto:
+streamlit run app.py
+
+🌐 Link da Aplicação (Deploy no Streamlit Cloud)
+👉 Acesse aqui o aplicativo
+
+👥 Integrantes do Grupo
+Paulo Henrique Dantas Teodósio RGM:40068170
+
+
+📌 Observações
+A API Gemini foi escolhida por ser gratuita e ensinada em aula
+A chave de API está protegida por meio do recurso st.secrets
+
+
+Projeto apresentado na disciplina de Fundamentos de Inteligência Artificial no curso de Ciência da Computação – 6º período.
