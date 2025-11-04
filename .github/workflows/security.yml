@@ -2,21 +2,21 @@ name: Varredura de Segurança (SAST e DAST)
 
 on:
   push:
-    branches: [ "main", "master" ] # Rodar no push para o branch principal
+    branches: [ "main" ] # Assumindo que seu branch principal é 'main'
   pull_request:
-    branches: [ "main", "master" ] # Rodar em PRs para o branch principal
+    branches: [ "main" ]
   workflow_dispatch: # Permite rodar manualmente
 
 jobs:
   #-----------------------------------------
-  # NÓ DE SAST (Análise Estática)
+  # NÓ 1: SAST (Análise Estática)
   #-----------------------------------------
   sast_codeql:
     name: SAST (CodeQL)
     runs-on: ubuntu-latest
     
     permissions:
-      security-events: write # Necessário para o CodeQL enviar alertas para a aba "Security"
+      security-events: write # Necessário para o CodeQL enviar alertas
       actions: read
       contents: read
 
@@ -24,38 +24,35 @@ jobs:
       - name: Checkout do repositório
         uses: actions/checkout@v4
 
-      # Inicializa o scanner CodeQL
+      # Inicializa o scanner CodeQL para Python
       - name: Inicializar CodeQL
         uses: github/codeql-action/init@v3
         with:
-          languages: python # <-- Mude aqui se for outra linguagem
+          languages: python
 
-      # Compila/Instala dependências (se necessário)
-      # O CodeQL tentará autodetectar, mas para Python é bom ter o setup
+      # Configura o ambiente Python para o CodeQL analisar
       - name: Configurar Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10' # Ajuste a versão do Python
+          python-version: '3.10' # Pode ajustar se usar outra
 
       - name: Instalar dependências
         run: |
-          if [ -f requirements.txt ]; then
-            pip install -r requirements.txt
-          fi
-
-      # Executa a análise do CodeQL
+          pip install -r requirements.txt
+          
+      # VALIDAÇÃO (SAST): O CodeQL analisa e falha se encontrar erros graves
       - name: Performar Análise CodeQL
         uses: github/codeql-action/analyze@v3
 
   #-----------------------------------------
-  # NÓ DE DAST (Análise Dinâmica)
+  # NÓ 2: DAST (Análise Dinâmica)
   #-----------------------------------------
   dast_zap:
     name: DAST (OWASP ZAP)
     runs-on: ubuntu-latest
     
-    # O DAST precisa que o SAST passe primeiro (opcional, mas recomendado)
-    needs: sast_codeql
+    # Espera o SAST terminar com sucesso
+    needs: sast_codeql 
 
     steps:
       - name: Checkout do repositório
@@ -64,17 +61,14 @@ jobs:
       - name: Configurar Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10' # Ajuste a versão
+          python-version: '3.10'
 
       - name: Instalar dependências
         run: |
-          if [ -f requirements.txt ]; then
-            pip install -r requirements.txt
-          fi
+          pip install -r requirements.txt
 
-      # Inicia a aplicação em background
-      # IMPORTANTE: Ajuste este comando para como seu app inicia
-      - name: Iniciar Aplicação (ex: Streamlit)
+      # Inicia o app Streamlit em background (porta padrão 8501)
+      - name: Iniciar Aplicação Streamlit
         run: |
           streamlit run app.py &
           sleep 15 # Dá 15 segundos para o servidor iniciar
@@ -83,13 +77,14 @@ jobs:
       - name: ZAP Baseline Scan
         uses: ZAP/action-baseline@v0.11.0
         with:
-          # URL alvo. Ajuste a porta se for diferente (Streamlit usa 8501)
+          # URL alvo (Streamlit roda na 8501 por padrão)
           target: 'http://localhost:8501'
           
-          # Validação: Falha a build se encontrar alertas (padrão é 'true')
-          # fail_action: true 
+          # VALIDAÇÃO (DAST): 'fail_action: true' é o padrão.
+          # Isso significa que o job FALHARÁ se o ZAP encontrar
+          # qualquer alerta (WARN ou FAIL), validando o pipeline.
           
-          # Gera um relatório HTML
+          # Gera um relatório HTML para análise
           cmd_options: '-r zap_report.html'
 
       # Upload do relatório DAST (sempre, mesmo se falhar)
